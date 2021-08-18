@@ -140,11 +140,11 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            BitMatrix matrix = readQRImage(args[0], 29); //Size is hard coded, but based on the byte size of the .rgb file we could probably guess the correct dimentions
+            BitMatrix matrix = readQRImage(args[0], 29); //Hard coded size, change if needed
 
             System.out.println(matrix);
 
-            Point[] unknownPixels = generateUnknownPixels(args[0], 29);
+            Point[] unknownPixels = generateUnknownPixels(args[0], 29); //Hard coded size, change if needed
 
             System.err.println("Brute-forcing missing modules...");
 

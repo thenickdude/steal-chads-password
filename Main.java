@@ -7,6 +7,7 @@ import com.google.zxing.qrcode.decoder.Decoder;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 class Point {
     int x, y;
@@ -26,8 +27,6 @@ public class Main {
         for (int y = 0; y < codeWidth; y++) {
             for (int x = 0; x < codeWidth; x++) {
                 int r = in.read();
-                int g = in.read();
-                int b = in.read();
 
                 if (r > 200) {
                     matrix.unset(x, y);
@@ -39,6 +38,31 @@ public class Main {
 
         return matrix;
     }
+    
+    //This could probably be intergrated better somehow, but for now this will do
+    private static Point[] generateUnknownPixels(String filename, int codeWidth) throws IOException {
+        FileInputStream in = new FileInputStream(filename);
+
+        ArrayList<Point> pointList = new ArrayList<Point>();
+
+        for (int y = 0; y < codeWidth; y++) {
+            for (int x = 0; x < codeWidth; x++) {
+                int r = in.read();
+                int g = in.read();
+
+                if (r > 200 && g < 20) {
+                    pointList.add(new Point(x, y));
+                    System.err.println("Missing point added, x:"+x+", y:"+y);
+                }
+            }
+        }
+
+        Point[] finished_arr = {};
+        finished_arr = pointList.toArray(finished_arr);
+
+        return finished_arr;
+    }
+
 
 
     private static void recurseGuessPixels(BitMatrix matrix, int pixelIndex, Point[] unknownPixels, Decoder decoder) throws FormatException {
@@ -116,22 +140,11 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            BitMatrix matrix = readQRImage(args[0], 29);
+            BitMatrix matrix = readQRImage(args[0], 29); //Hard coded size, change if needed
 
             System.out.println(matrix);
 
-            // This isn't every unknown pixel but it seems to be enough to get a result
-            Point[] unknownPixels = new Point[] {
-                new Point(0, 9), new Point(1, 9), new Point(2, 9), new Point(3, 9), new Point(4, 9), new Point(5, 9),
-                new Point(0, 10), new Point(1, 10), new Point(2, 10), new Point(3, 10), new Point(4, 10), new Point(5, 10),
-                new Point(0, 11), new Point(1, 11), new Point(2, 11), new Point(3, 11), new Point(4, 11),
-                new Point(0, 12),
-
-                new Point(14, 2), new Point(14, 3), new Point(14, 4), new Point(14, 5),
-                new Point(15, 3), new Point(15, 4), new Point(15, 5),
-                new Point(16, 3), new Point(16, 4), new Point(16, 5),
-                new Point(17, 4), new Point(17, 5)
-            };
+            Point[] unknownPixels = generateUnknownPixels(args[0], 29); //Hard coded size, change if needed
 
             System.err.println("Brute-forcing missing modules...");
 
